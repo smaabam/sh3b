@@ -1,0 +1,38 @@
+{
+  "name": "medical-batch-submissions",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "lint": "eslint .",
+    "firebase:project": "node scripts/write-firebaserc.mjs",
+    "firebase:login": "npx firebase-tools login",
+    "firebase:rules": "npm run firebase:project && npx firebase-tools deploy --only firestore:rules",
+    "firebase:check": "node scripts/firebase-live-check.mjs"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "latest",
+    "@vitejs/plugin-react": "latest",
+    "clsx": "latest",
+    "exceljs": "^4.4.0",
+    "firebase": "^12.13.0",
+    "lucide-react": "latest",
+    "papaparse": "^5.5.3",
+    "react": "latest",
+    "react-dom": "latest",
+    "recharts": "latest",
+    "sonner": "latest",
+    "tailwindcss": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "eslint": "latest",
+    "eslint-plugin-react-hooks": "latest",
+    "eslint-plugin-react-refresh": "latest",
+    "globals": "latest"
+  }
+}

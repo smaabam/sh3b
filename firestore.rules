@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && (
+          request.auth.token.admin == true
+          || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        );
+    }
+
+    function publicSubmissionShape() {
+      return request.resource.data.keys().hasOnly([
+        'studentId',
+        'fullName',
+        'expectedDate',
+        'expectedLocation',
+        'notes',
+        'createdAt',
+        'source'
+      ])
+      && request.resource.data.studentId is string
+      && request.resource.data.studentId.size() > 0
+      && request.resource.data.studentId.size() <= 60
+      && request.resource.data.fullName is string
+      && request.resource.data.fullName.size() > 0
+      && request.resource.data.fullName.size() <= 120
+      && request.resource.data.expectedDate is string
+      && request.resource.data.expectedDate.size() > 0
+      && request.resource.data.expectedDate.size() <= 40
+      && request.resource.data.expectedLocation is string
+      && request.resource.data.expectedLocation.size() > 0
+      && request.resource.data.expectedLocation.size() <= 160
+      && request.resource.data.notes is string
+      && request.resource.data.notes.size() <= 800
+      && request.resource.data.source == 'student-public-form'
+      && request.resource.data.createdAt == request.time;
+    }
+
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /settings/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /students/{studentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /publicSubmissions/{submissionId} {
+      allow create: if isAdmin() || publicSubmissionShape();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
